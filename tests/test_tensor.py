@@ -53,5 +53,53 @@ class TestTensor(unittest.TestCase):
         np.testing.assert_array_equal(y.grad, Tensor(33))
 
 
+    def test_matrix_operations(self):
+        # matrix multiplication
+        t1 = Tensor([[1, 2, 3], [4, 5, 6]])
+        t2 = Tensor([[1, 2], [3, 4], [5, 6]])
+        np.testing.assert_array_equal(t1@t2, Tensor([[22, 28], [49, 64]]))
+
+        # matrix addition
+        t1 = Tensor([[1, 2, 3], [4, 5, 6]])
+        t2 = Tensor([[1, 2, 3], [4, 5, 6]])
+        np.testing.assert_array_equal(t1+t2, Tensor([[2, 4, 6], [8, 10, 12]]))
+
+        # matrix subtraction
+        t1 = Tensor([[1, 2, 3], [4, 5, 6]])
+        t2 = Tensor([[1, 2, 3], [4, 5, 6]])
+        np.testing.assert_array_equal(t1-t2, Tensor([[0, 0, 0], [0, 0, 0]]))
+
+        # matrix element-wise multiplication
+        t1 = Tensor([[1, 2, 3], [4, 5, 6]])
+        t2 = Tensor([[1, 2, 3], [4, 5, 6]])
+        np.testing.assert_array_equal(t1*t2, Tensor([[1, 4, 9], [16, 25, 36]]))
+
+    
+    def test_matrix_diff_basic(self):
+        # build graph
+        x = Tensor([[1, 2, 3], [4, 5, 6]])
+        y = Tensor([[1, 2, 3], [4, 5, 6]])
+        a = 6*x + 3*y
+        b = 4*x + 9*y
+        z = 2*a + 3*b
+
+        # run backward
+        z.back_prop()
+        np.testing.assert_array_equal(x.grad, Tensor([[24, 24, 24], [24, 24, 24]]))
+        np.testing.assert_array_equal(y.grad, Tensor([[33, 33, 33], [33, 33, 33]]))
+
+
+    def test_matrix_diff_advanced(self):
+        # build graph
+        t1 = Tensor([[1, 2, 3], [4, 5, 6]])
+        t2 = Tensor([[1, 2], [3, 4], [5, 6]])
+        z = t1 @ t2
+
+        # run backward
+        z.back_prop()
+        np.testing.assert_array_equal(t1.grad, Tensor([[1, 3, 5], [2, 4, 6]]))
+        np.testing.assert_array_equal(t2.grad, Tensor([[1, 4], [2, 5], [3, 6]]))
+
+
 if __name__ == '__main__':
     unittest.main()

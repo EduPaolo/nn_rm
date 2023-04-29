@@ -5,7 +5,6 @@ import numpy as np
 import numpy.typing as npt
 
 
-
 class Tensor(np.lib.mixins.NDArrayOperatorsMixin):
     def __init__(self, arr: npt.ArrayLike):
         self.arr = np.array(arr, dtype=np.float32)
