@@ -1,12 +1,12 @@
 import unittest
 import numpy as np
 from nn_rm.tensor import Tensor
-from nn_rm.nn.relu import ReLu
+from nn_rm.nn.relu import ReLU
 
 
 class TestTensorDiff(unittest.TestCase):
     def setUp(self):
-        self.relu = ReLu()
+        self.relu = ReLU()
 
 
     def test_diff_rm(self):
@@ -39,14 +39,14 @@ class TestTensorDiff(unittest.TestCase):
 
     def test_matrix_diff_advanced(self):
         # build graph
-        t1 = Tensor([[1, 2, 3], [4, 5, 6]])
-        t2 = Tensor([[1, 2], [3, 4], [5, 6]])
+        t1 = Tensor([[1, 2, 3], [4, 5, 6]], requires_grad=True)
+        t2 = Tensor([[1, 2], [3, 4], [5, 6]], requires_grad=True)
         z = t1 @ t2
 
         # run backward
         z.back_prop()
-        np.testing.assert_array_equal(t1.grad, Tensor([[1, 3, 5], [2, 4, 6]]))
-        np.testing.assert_array_equal(t2.grad, Tensor([[1, 4], [2, 5], [3, 6]]))
+        np.testing.assert_array_equal(t1.grad, Tensor([[3, 7, 11], [3, 7, 11]]))
+        np.testing.assert_array_equal(t2.grad, Tensor([[5, 5], [7, 7], [9, 9]]))
 
 
     def test_relu_diff(self):

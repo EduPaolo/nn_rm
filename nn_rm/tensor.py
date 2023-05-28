@@ -6,15 +6,16 @@ import numpy.typing as npt
 
 
 class Tensor(np.lib.mixins.NDArrayOperatorsMixin):
-    def __init__(self, arr: npt.ArrayLike):
+    def __init__(self, arr: npt.ArrayLike, requires_grad: bool=False):
         self.arr = np.array(arr, dtype=np.float32)
+        self.requires_grad = requires_grad
         self.grad: Any = 0
         self.backward: Callable = lambda: None
         self.children: list = []
 
 
     def back_prop(self):
-        self.grad = 1
+        self.grad = np.ones_like(self.arr)
         self.__wrap_backward()
 
 
@@ -25,7 +26,7 @@ class Tensor(np.lib.mixins.NDArrayOperatorsMixin):
 
 
     def __repr__(self) -> str:
-        return f"Tensor({self.arr})"
+        return f"Tensor({self.arr}, requires_grad={self.requires_grad})"
 
 
     def __array__(self) -> np.ndarray:
@@ -119,8 +120,9 @@ class Tensor(np.lib.mixins.NDArrayOperatorsMixin):
         parent_tensor.children.append(other)
 
         def backward():
-            self.grad += parent_tensor.grad*np.transpose(other)
-            other.grad += parent_tensor.grad*np.transpose(self)
+            breakpoint()
+            self.grad = self.grad + parent_tensor.grad @ other
+            other.grad = other.grad + parent_tensor.grad @ self
 
         parent_tensor.backward = backward
 
